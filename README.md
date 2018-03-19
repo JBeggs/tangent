@@ -16,6 +16,9 @@ Ubuntu 16.04 running...
 * Use pip to install Django
 `pip install -r requirements.pip`
 
+* Change directory
+`cd tangent`
+
 * Migrate the database
 `python manage.py migrate`
 
