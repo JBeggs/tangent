@@ -19,8 +19,14 @@ Ubuntu 16.04 running...
 * Change directory
 `cd tangent`
 
+* Make Migration the database
+`python manage.py makemigration`
+
 * Migrate the database
 `python manage.py migrate`
+
+* You might need to clear the migrations already made
+`rm review/migrations/00*`
 
 * Collect static Files
 `python manage.py collectstatic`
@@ -28,4 +34,11 @@ Ubuntu 16.04 running...
 * Run the server
 `python manage.py runserver`
 
-* Go to http://localhost:8000
+* Go to http://localhost:8000/dashboard/
+
+
+NB!!!!!!!!!
+* If its a new install under utility use update Database on the dashboard page...
+
+* `Then logout and log back in`
+
