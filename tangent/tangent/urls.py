@@ -1,18 +1,3 @@
-"""tangent URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.11/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.conf.urls import url, include
-    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
-"""
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import include, url
@@ -20,10 +5,16 @@ from django.contrib import admin
 from review import views
 
 urlpatterns = [
-    #url(r"^index/", views.IndexTemplateView.as_view(), name="index"),
+
+    ## login not working on django side, looking for a bug...
+
+    # some ajax request stuff
+    url(r'^import_employees/$', views.import_employees, name='import_employees'),
+    url(r'^import_review/$', views.import_review, name='import_review'),
+    url(r'^login_user/$', views.login_user, name='login_user'),
+    # Actual pages login and index
     url(r"^login/", views.LoginTemplateView.as_view(), name="login"),
-    url(r"^logout/", views.LogoutTemplateView.as_view(), name="logout"),
     url("", views.IndexTemplateView.as_view(), name="index"),
 
-
+# Static files
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -46,7 +46,8 @@ function toggle_employees(){
 
 function your_worth(worth){
         if (worth>=4){
-                alert("worth it");}
+            me();
+            employed();
         else if (worth==3){
             me();
             employed();

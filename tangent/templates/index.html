@@ -1,4 +1,16 @@
-{% load static %}
+{% load static tangent_tags %}
+
+
+
+
+<!--
+
+
+
+Not happy with HTML but look at the Python
+
+
+-->
 
 
 <!DOCTYPE HTML>
@@ -21,71 +33,81 @@
 					<nav id="nav">
 						<ul>
 							<li><a href="/index/">Home</a></li>
-                            <li><a onclick="profile();" href="#1">Profile</a></li>
-                            <li><a onclick="toggle_employees();" href="#1">Employees</a></li>
-							<li><a href="/logout/" class="button special">Log Out</a></li>
+                            <!--<li><a onclick="profile();" href="#1">Profile</a></li>
+                            <li><a onclick="toggle_employees();" href="#1">Employees</a></li>-->
+							<li><a href="/login/" class="button special">Log Out</a></li>
 						</ul>
 					</nav>
 				</header>
 
-
-				<footer id="footer" class="">
-
-					
-
-				</footer> 
-
-				<section id="one" class="spotlight style1 bottom hidden" style="display:none;">
-					<div class="content">
+		        <!-- One -->
+				<section id="one" class="spotlight style1 bottom">
+ 					<div class="content">
 						<div class="container">
 							<div class="row">
 								<div class="4u 12u$(medium)">
 									<header>
 										<h2>Welcome</h2>
-										<p></p>
+										<p>{{ request.user }}</p>
 									</header>
 								</div>
-								<div class="4u 12u$(medium)" id="personal_data">
-									<p>Your Profile</p>
+								<div class="4u 12u$(medium)">
+									<p>{{ review }}</p>
 								</div>
-
-							</div>
-						</div>
-					</div>	
-				</section>
-
-
-				<section id="three" class="spotlight style1 bottom data" style="display:none;">
-					<div class="content">
-						<div class="container">
-							<div class="row user">
-
+								<div class="4u$ 12u$(medium)">
+									<p>{% b_day 'test' %}</p>
+								</div>
 							</div>
 						</div>
 					</div>
 					
 				</section>
 
-				<section id="four" class="spotlight style1 bottom data" style="display:none;">
-					<div class="content">
-						<div class="container">
-							<div class="row position">
+
+			<!-- Four -->
+				<section id="four" class="wrapper style1 special fade-up">
+					<div class="container">
+						<header class="major">
+							<h2>Employees</h2>
+							<p></p>
+						</header>
+						<div class="box alt">
+							<div class="row uniform">
+
+
+                                <h2></h2>
+
+
+                                {% for user in object_list %}
+          
+
+								    <section class="4u 6u(medium) 12u$(xsmall)">
+        
+									    <h3>{{ user.user.first_name }} {{ user.user.last_name }}</h3>
+									    <p>{{ user.phone_number }}</p>
+                                        <p>{{ user.email }}</p>
+								    </section>
+
+
+
+
+                                {% endfor %}
+
+
 								
-							</div>
-						</div>
-					</div>
-					
-				</section>
 
-				<section id="five" class="spotlight style1 bottom data" style="display:none;">
-					<div class="content">
-						<div class="container">
-							<div class="row detail">
-								
+
+
+
+
 							</div>
 						</div>
+						<footer class="major">
+							<ul class="actions">
+								<!--<li><a href="#" class="button">Magna sed feugiat</a></li>-->
+							</ul>
+						</footer>
 					</div>
-					
 				</section>
 
 

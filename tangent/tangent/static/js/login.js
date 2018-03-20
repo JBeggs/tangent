@@ -1,127 +1,88 @@
-function createCookie(name, value, days) {
-    var expires;
-
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
-    } else {
-        expires = "";
-    }
-    document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
-}
-
-function readCookie(name) {
-    var nameEQ = encodeURIComponent(name) + "=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) === ' ')
-            c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) === 0)
-            return decodeURIComponent(c.substring(nameEQ.length, c.length));
-    }
-    return null;
-}
-
-function eraseCookie(name) {
-    createCookie(name, "", -1);
-}
-
+// Well don't we just love javascript
 
 $(".user").focusin(function(){$(".inputUserIcon").css("color", "#e74c3c");}).focusout(function(){$(".inputUserIcon").css("color", "white");});
 $(".pass").focusin(function(){$(".inputPassIcon").css("color", "#e74c3c");}).focusout(function(){ $(".inputPassIcon").css("color", "white");});
 
 
-function security(){
-    
+// These functions are in reverse order
+// login is the last to run
+// This hack isn't working, login of user not working
+function login(data){
     $.ajax({
-        url: 'http://staging.tangent.tngnt.co/api/user/me/',
+        url: '/login_user/',
         type: 'GET',
-
         dataType: 'json',
         contentType: 'application/json',
-        headers: {
-            'Authorization': "Token " + readCookie('token'),
-        },
-
-        success: function(data) { 
-
-            records = 1;
-            html = "<table><tbody>"
-            $.each( data, function( key, val ) {
-
-                security_level = 0;
-                if (key =="is_active"){security_level += 1;} else if(key =="is_staff"){security_level += 2;} else if(key =="is_superuser"){security_level += 3;}                
-                html += "</tr><td>"+ key +"</td><td>"+ val +"</td></tr>"
-            });
-
-            html += "</tbody></table>"
-            eraseCookie('risk');
-            createCookie('risk',security_level,1);
-            createCookie('risk_cookie',readCookie('token'),1);
-            createCookie('user',html,1);
-            your_worth(security_level);
-        },
-        error : function(){
-            $("#login_error").html("Please Try me again...");
-
-        }
+        data:JSON.stringify(data),
+        success: function(return_data) { 
+                    $("#login_error").html("lOGGIN IN...");
+                    window.location = return_data.url;},
+        error : function(){$("#login_error").html("Please Try me again...");}
+    });
+};
+// Tail end of importing reviews
+function import_review(data){
+    $.ajax({
+        url: '/import_review/',
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data:JSON.stringify(data),
+        success: function(return_data) 
+                    {$("#login_error").html("Waiting for last import...");
+                    login($('#username').val());},
+        error : function(){$("#login_error").html("Please Try me again...");}
+    });
+};
+// Basic importing reviews
+function get_review(token){
+    $.ajax({
+        url: 'http://staging.tangent.tngnt.co/api/review/',
+        type: 'GET',
+        dataType: 'json',
+        contentType: 'application/json',
+        headers: {'Authorization': "Token " + token,},
+        success: function(data) {import_review(data);},
+        error : function(){$("#login_error").html("Please Try me again...");}
+    });
+};
+// Request to Django to import the employees
+function import_employees(data,token){
+    $.ajax({
+        url: '/import_employees/',
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data:JSON.stringify(data),
+        success: function(return_data) {
+                    get_review(token);
+                    $("#login_error").html("Waiting for imports...");},
+        error : function(){ $("#login_error").html("Please Try me again...");}
+    });
+};
+// Request to web API to get the employees data
+function get_employees(token){
+    $.ajax({
+        url: 'http://staging.tangent.tngnt.co/api/employee/',
+        type: 'GET',
+        dataType: 'json',
+        contentType: 'application/json',
+        headers: {'Authorization': "Token " + token,},
+        success: function(data) {import_employees(data,token);},
+        error : function(){$("#login_error").html("Please Try me again...");}
     });
 
 };
-
-
-function your_worth(worth){
-        if (worth>=3){
-            // Worth it
-            window.location = "/index/";
-        } else if (worth<3){
-            $('#login_form h2').html("Back again loser");
-            $('#login_error').html("Sheep don't belong here");
-        }
-}
-
-
-if (readCookie('token')==null || readCookie('token')=='empty'){
-    if(readCookie('risk')!=null){
-        your_worth(readCookie('risk'));
-        createCookie('token','empty',1);
-    } else {
-        createCookie('token','empty',1);
-        $( "#login_form" ).show();
-    };
-} else {
-    if(readCookie('risk')!=null){
-        your_worth(readCookie('risk'));           
-    } else {
-        security();
-    };
-};
-
-
+//Initial login request using token and username & password
+// on success send token with function get_employees...
 $("#login_form" ).submit(function( event ) {
     $("#login_error").html("Please Wait...  ");
     $.ajax({
         url: 'http://staging.tangent.tngnt.co/api-token-auth/',
         type: 'POST',
         data: $('#login_form').serialize(), 
-        success: function(data) { 
-            eraseCookie('token');
-            createCookie('token',data.token,1);
-            
-            if(readCookie('risk')!=null){
-                your_worth(readCookie('risk'));          
-            } else {
-                security();
-            };
-
-        },
-        error : function(){
-            $("#login_error").html("Invalid username or password");
-            createCookie('token','empty',1);
-            eraseCookie('risk');
-        }
+        success: function(data) {get_employees(data.token);},
+        error : function(){$("#login_error").html("Invalid username or password");}
     });
   event.preventDefault();
 });
