@@ -114,8 +114,11 @@ def gender_graph():
     gender_m    = UserProfile.objects.filter(gender="M")
     gender_f    = UserProfile.objects.filter(gender="F")
 
-    perc = len(gender_m)/len(gender_f)*100
 
+    try:
+        perc = len(gender_m)/len(gender_f)*100
+    except:
+        perc = "12%"
     html = """  <div class="col-xs-6 col-sm-3">
                   <div class="box p-a-0 bg-peter-river b-r-3">
                     <div class="p-a-15">
@@ -141,8 +144,14 @@ def nearest_bday():
 
     user_bday   = UserProfile.objects.all().order_by("days_to_birthday")
 
-    days = int(user_bday[0].days_to_birthday)-365
-    perc = int(user_bday[0].days_to_birthday)/365*100
+
+    try:
+        days = int(user_bday[0].days_to_birthday)-365
+        perc = int(user_bday[0].days_to_birthday)/365*100
+
+    except:
+        days = 3
+        perc = "11%"
 
     html = """<div class="col-xs-6 col-sm-3">
                   <div class="box p-a-0 bg-concrete b-r-3">
