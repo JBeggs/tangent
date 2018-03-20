@@ -34,4 +34,11 @@ Ubuntu 16.04 running...
 * Run the server
 `python manage.py runserver`
 
-* Go to http://localhost:8000
+* Go to http://localhost:8000/dashboard/
+
+
+NB!!!!!!!!!
+* If its a new install under utility use update Database on the dashboard page...
+
+* `Then logout and log back in`
+
