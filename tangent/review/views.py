@@ -27,6 +27,11 @@ class IndexTemplateView(ListView):
     model = UserProfile
     template_name = "index.html"
 
+
+class DashboardTemplateView(ListView):
+    model = UserProfile
+    template_name = "dashboard.html"
+
 # Import the users from request
 @csrf_exempt
 def import_employees(request):

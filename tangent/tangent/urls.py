@@ -14,6 +14,9 @@ urlpatterns = [
     url(r'^login_user/$', views.login_user, name='login_user'),
     # Actual pages login and index
     url(r"^login/", views.LoginTemplateView.as_view(), name="login"),
+
+    url(r"^dashboard/", views.DashboardTemplateView.as_view(), name="dashboard"),
+
     url("", views.IndexTemplateView.as_view(), name="index"),
 
 # Static files
