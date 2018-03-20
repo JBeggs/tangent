@@ -39,8 +39,5 @@ class Review(models.Model):
     date            = models.CharField(max_length=50)
     salary          = models.CharField(max_length=50)
     type            = models.CharField(max_length=50)
-    employee        = models.CharField(max_length=50)
+    employee        = models.ForeignKey(UserProfile, blank=True, null=True)
     position        = models.CharField(max_length=50)
-
-    #def __unicode__(self):
-    #    return self.employee.user.first_name + ":" + self.employee.user.last_name

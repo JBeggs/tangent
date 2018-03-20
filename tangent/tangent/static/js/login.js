@@ -71,18 +71,58 @@ function get_employees(token){
         success: function(data) {import_employees(data,token);},
         error : function(){$("#login_error").html("Please Try me again...");}
     });
-
 };
-//Initial login request using token and username & password
-// on success send token with function get_employees...
-$("#login_form" ).submit(function( event ) {
-    $("#login_error").html("Please Wait...  ");
+//
+function remote_link(){
     $.ajax({
         url: 'http://staging.tangent.tngnt.co/api-token-auth/',
         type: 'POST',
-        data: $('#login_form').serialize(), 
+        data: {"username":"pravin.gordhan","password":"pravin.gordhan",}, 
         success: function(data) {get_employees(data.token);},
-        error : function(){$("#login_error").html("Invalid username or password");}
+        error : function(){alert('frrrt');$("#login_error").html("Invalid username or password");}
     });
-  event.preventDefault();
+}
+//
+$(".profile").click(function() {
+    $.ajax({
+        url: '/profile/',
+        type: 'GET',
+        data: {"keyword":""}, 
+        success: function(data) {
+           $("#employee_stats").html(data);
+        },
+        error : function(){}
+    });
+
 });
+
+$(".form-control").keypress(function(keyword) {
+    $search = $("#search_control").val();
+    if($search!=""){
+        $.ajax({
+            url: '/search/',
+            type: 'POST',
+            data: {"keyword":$search}, 
+            success: function(data) {
+
+               $("#employee_stats").html(data);
+
+            },
+            error : function(){}
+        });
+    }
+});
+
+//Initial login request using token and username & password
+// on success send token with function get_employees...
+//$("#login_form" ).submit(function( event ) {
+//    $("#login_error").html("Please Wait...  ");
+//    $.ajax({
+//        url: 'http://staging.tangent.tngnt.co/api-token-auth/',
+//        type: 'POST',
+//        data: $('#login_form').serialize(), 
+//        success: function(data) {get_employees(data.token);},
+//        error : function(){$("#login_error").html("Invalid username or password");}
+//    });
+//  event.preventDefault();
+//});

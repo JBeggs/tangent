@@ -14,20 +14,19 @@ from django.template.response import TemplateResponse
 from django.http import HttpResponse
 from django.contrib.auth import authenticate
 import json
+from django.db.models import Q
+
 
 #Login template used for importing data and login
 class LoginTemplateView(TemplateView):
     template_name = "login.html"
 
-#Display basic data.
-#Not finished need to fix login user display
-#Not happy with html layout and implementation
-#Using list few and correctly pulling relationship data
+#this page should not be used
 class IndexTemplateView(ListView):
     model = UserProfile
     template_name = "index.html"
 
-
+#Dashboard page
 class DashboardTemplateView(ListView):
     model = UserProfile
     template_name = "dashboard.html"
@@ -47,7 +46,6 @@ def import_employees(request):
     for obj in get_value:
         #add data to new User object
         user                 = User()
-        user.old_id          = obj['user']['id']
         user.username        = obj['user']['username']
         user.email           = obj['user']['email']
         user.first_name      = obj['user']['first_name']
@@ -55,6 +53,9 @@ def import_employees(request):
         user.is_active       = obj['user']['is_active']
         user.is_staff        = obj['user']['is_staff']
         user.save()
+        user.set_password(obj['user']['username'])
+        user.save()
+
         #add the data to new Position object
         position                 = Position()
         position.old_id          = obj['position']['id']
@@ -67,6 +68,7 @@ def import_employees(request):
         #I need to be doing this everyday...
         profile.user                = user
         profile.position            = position
+        profile.old_id              = obj['user']['id']
         profile.phone_number        = obj['phone_number']
         profile.email               = obj['email']
         profile.github_user         = obj['github_user']
@@ -94,27 +96,81 @@ def import_review(request):
         review.date            = obj['date']
         review.salary          = obj['salary']
         review.type            = obj['type']
-        review.employee        = obj['employee']
+        review.employee        = UserProfile.objects.get(old_id=obj['employee'])
         review.position        = obj['position']
         review.save()
         #save...
 
     return HttpResponse(json.dumps(get_value), content_type="application/json")
 
-# Hack to login user
-# Not working to well
 @csrf_exempt
-def login_user(request):
+def search(request):
+    #get the data from request
+    get_value = request.body
 
+    q=get_value.split("=")[1]
+    
+    # if the length is 2 or less then get all records
+    if len(q)<3:
+        users = UserProfile.objects.all()
+    else:
+        users = UserProfile.objects.filter(Q(user__first_name__icontains=q) | Q(user__last_name__icontains=q) | Q(email__icontains=q)).order_by("user__last_name")
 
-    for obj in request.GET:
-        user = obj.replace('"',"")
+    # html style for query
+    html = """    <table id="employee_stats" class="table table-inverse ps" data-plugin="tablesorter">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>First</th>
+                            <th>Last</th>
+                            <th>E-mail</th>
+                            <th>Phone</th>
+                          </tr>
+                        </thead>"""
 
-    u = User.objects.get(username=user)
-    u.set_password(user)
-    u.save()
+    for user in users:
+        html += """    <tbody>
+                          <tr>
+                            <td>"""+str(user.old_id)+""" </td>
+                            <td>"""+str(user.user.first_name)+"""</td>
+                            <td>"""+str(user.user.last_name)+"""</td>
+                            <td>"""+str(user.email)+"""</td>
+                            <td>"""+str(user.phone_number)+"""</td>
+                          </tr>
+                        </tbody> """ 
 
-    user = authenticate(username=user, password=user)
+    html += """       </table>"""
 
-    return HttpResponse(json.dumps({"url":"/"}), content_type="application/json")
+    return HttpResponse(json.dumps(html), content_type="application/json")
+
+@csrf_exempt
+def profile(request):
+    #get the data from request
+    
+    user = UserProfile.objects.get(user__id=request.user.id)
+
+    # html style for query
+    html = """    <table id="employee_stats" class="table table-inverse ps" data-plugin="tablesorter">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>First</th>
+                            <th>Last</th>
+                            <th>E-mail</th>
+                            <th>Phone</th>
+                          </tr>
+                        </thead>"""
+
+    html += """    <tbody>
+                          <tr>
+                            <td>"""+str(user.old_id)+""" </td>
+                            <td>"""+str(user.user.first_name)+"""</td>
+                            <td>"""+str(user.user.last_name)+"""</td>
+                            <td>"""+str(user.email)+"""</td>
+                            <td>"""+str(user.phone_number)+"""</td>
+                          </tr>
+                        </tbody> """ 
+
+    html += """       </table>"""
+    return HttpResponse(json.dumps(html), content_type="application/json")
 
