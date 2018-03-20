@@ -19,8 +19,14 @@ Ubuntu 16.04 running...
 * Change directory
 `cd tangent`
 
+* Make Migration the database
+`python manage.py makemigration`
+
 * Migrate the database
 `python manage.py migrate`
+
+* You might need to clear the migrations already made
+rm review/migrations/00*
 
 * Collect static Files
 `python manage.py collectstatic`
