@@ -213,7 +213,7 @@
                   </a>
                   <ul class="nav nav-sub nav-stacked">
                     <li>
-                      <a href="#1" onclick="remote_link();">Update Database</a>
+                      <a href="#1" onclick="token();">Update Database</a>
                     </li>
                   </ul>
                 </li>
@@ -282,9 +282,9 @@
               <div class="row">
 
 
-                {% gender_graph %}
+                {% comment %}{% gender_graph %}
 
-                {% nearest_bday %}
+                {% nearest_bday %}{% endcomment %}
                 
 
                 <div class="col-sm-7">
@@ -305,6 +305,12 @@
 
               <!-- BEGIN: .row -->
               <div class="row">
+
+
+                {% salary_increase %}
+
+                {% review_employee %}
+
 
               </div>
               <!-- END: .row -->

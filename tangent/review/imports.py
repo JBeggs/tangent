@@ -17,29 +17,11 @@ import json
 from django.db.models import Q
 
 
-#Login template used for importing data and login
-class LoginTemplateView(TemplateView):
-    template_name = "login.html"
-
-#this page should not be used
-class IndexTemplateView(ListView):
-    model = UserProfile
-    template_name = "index.html"
-
-#Dashboard page
-class DashboardTemplateView(ListView):
-    model = UserProfile
-    template_name = "dashboard.html"
-
 # Import the users from request
 @csrf_exempt
 def import_employees(request):
     #get the data from the request
     get_value = json.loads(request.body)
-
-
-
-
 
     if 'user' in get_value[0]:
         #kill previous users...and there relationship models
@@ -124,7 +106,7 @@ def import_employees(request):
     elif 'unique' and 'date' in get_value[0]:
 
         #delete old records
-        Leave.objects.all().delete()
+        PublicHoliday.objects.all().delete()
         #loop and import
         for obj in get_value:
             holiday         = PublicHoliday()
@@ -164,78 +146,3 @@ def import_employees(request):
 
 
     return HttpResponse(json.dumps(get_value), content_type="application/json")
-
-
-@csrf_exempt
-def search(request):
-    #get the data from request
-    get_value = request.body
-
-    q=get_value.split("=")[1]
-    
-    # if the length is 2 or less then get all records
-    if len(q)<3:
-        users = UserProfile.objects.all()
-    else:
-        users = UserProfile.objects.filter(Q(user__first_name__icontains=q) | Q(user__last_name__icontains=q) | Q(email__icontains=q)).order_by("user__last_name")
-
-    # html style for query
-    html = """    <table id="employee_stats" class="table table-inverse ps" data-plugin="tablesorter">
-                        <thead>
-                          <tr>
-                            <th>#</th>
-                            <th>First</th>
-                            <th>Last</th>
-                            <th>E-mail</th>
-                            <th>Phone</th>
-                          </tr>
-                        </thead>"""
-
-    for user in users:
-
-
-        html += """    <tbody>
-                          <tr>
-                            <td>"""+str(user.old_id)+""" </td>
-                            <td>"""+str(user.user.first_name)+"""</td>
-                            <td>"""+str(user.user.last_name)+"""</td>
-                            <td>"""+str(user.email)+"""</td>
-                            <td>"""+str(user.phone_number)+"""</td>
-                          </tr>
-                        </tbody> """ 
-
-    html += """       </table>"""
-
-    return HttpResponse(json.dumps(html), content_type="application/json")
-
-@csrf_exempt
-def profile(request):
-    #get the data from request
-    
-    user = UserProfile.objects.get(user__id=request.user.id)
-
-    # html style for query
-    html = """    <table id="employee_stats" class="table table-inverse ps" data-plugin="tablesorter">
-                        <thead>
-                          <tr>
-                            <th>#</th>
-                            <th>First</th>
-                            <th>Last</th>
-                            <th>E-mail</th>
-                            <th>Phone</th>
-                          </tr>
-                        </thead>"""
-
-    html += """    <tbody>
-                          <tr>
-                            <td>"""+str(user.old_id)+""" </td>
-                            <td>"""+str(user.user.first_name)+"""</td>
-                            <td>"""+str(user.user.last_name)+"""</td>
-                            <td>"""+str(user.email)+"""</td>
-                            <td>"""+str(user.phone_number)+"""</td>
-                          </tr>
-                        </tbody> """ 
-
-    html += """       </table>"""
-    return HttpResponse(json.dumps(html), content_type="application/json")
-

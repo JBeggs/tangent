@@ -2,14 +2,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import include, url
 from django.contrib import admin
-from review import views
+from review import views, imports
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
 
     # some ajax request stuff
-    url(r'^import_employees/$', views.import_employees, name='import_employees'),
-    url(r'^import_review/$', views.import_review, name='import_review'),
+    url(r'^import_employees/$', imports.import_employees, name='import_employees'),
     url(r'^search/$', views.search, name='search'),
     url(r'^profile/$', views.profile, name='profile'),
     # main pages

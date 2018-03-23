@@ -1,6 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
-from review.models import UserProfile,Review
+from review.models import UserProfile,Review,Leave,Customer,PublicHoliday
 register = template.Library()
 
 
@@ -110,11 +110,8 @@ def to_do():
 
 @register.simple_tag()
 def gender_graph():
-
     gender_m    = UserProfile.objects.filter(gender="M")
     gender_f    = UserProfile.objects.filter(gender="F")
-
-
     try:
         perc = len(gender_m)/len(gender_f)*100
     except:
@@ -141,10 +138,7 @@ def gender_graph():
 
 @register.simple_tag()
 def nearest_bday():
-
     user_bday   = UserProfile.objects.all().order_by("days_to_birthday")
-
-
     try:
         days = int(user_bday[0].days_to_birthday)-365
         perc = int(user_bday[0].days_to_birthday)/365*100
@@ -175,4 +169,64 @@ def nearest_bday():
 
 
 
+@register.simple_tag()
+def salary_increase():
+
+    holiday = PublicHoliday.objects.all()
+    html = """<div class="col-sm-4">
+                  <div class="box shadow-2dp b-r-2">
+                    <header class="b-b">
+                      <h4>Holidays</h4>
+                    </header>
+                    <div class="box-body">
+                      <ul class="tasks">"""
+    for h in holiday:
+        html += """<li class="task">
+                          <div class="task-media bg-alizarin">
+                            <i class="fa fa-fw fa-plus"></i>
+                          </div>
+                          <div class="task-info">
+                            <a class="task-info-link" href="#">"""+str(h.name)+"""</a>
+                            <div>
+                              <i></i>
+                              <span>"""+str(h.date)+"""</span>
+                            </div>
+                          </div>
+                        </li>"""
+    html +="""        </ul>
+                    </div>
+                  </div>
+                </div>"""
+
+    return mark_safe(html)
+
+@register.simple_tag()
+def review_employee():
+
+    html = """<div class="col-sm-4">
+                  <div class="box shadow-2dp">
+                    <header>
+                      <h4>Employee
+                        <small class="text-muted">Reviews</small>
+                      </h4>
+                    </header>
+                    <div class="box-body p-a-0">
+                      <nav class="list-group m-a-0">
+                        <a href="#" class="list-group-item b-r-0">
+                          Gwenborough
+                          <span class="pull-right">28%</span>
+                          <span class="list-group-progress" style="width: 59%;"></span>
+                        </a>
+                        <a href="#" class="list-group-item b-r-0">
+                          Wisokyburgh
+                          <span class="pull-right">96%</span>
+                          <span class="list-group-progress" style="width: 55%;"></span>
+                        </a>
+                      </nav>
+                    </div>
+                  </div>
+                </div>"""
+
+    return mark_safe(html)
+                
                 

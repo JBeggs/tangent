@@ -20,68 +20,67 @@ function login(data){
         error : function(){$("#login_error").html("Please Try me again...");}
     });
 };
-// Tail end of importing reviews
-function import_review(data){
+
+
+
+
+
+function token() {
+
     $.ajax({
-        url: '/import_review/',
-        type: 'POST',
-        dataType: 'json',
-        contentType: 'application/json',
-        data:JSON.stringify(data),
-        success: function(return_data) 
-                    {$("#login_error").html("Waiting for last import...");
-                    login($('#username').val());},
-        error : function(){$("#login_error").html("Please Try me again...");}
-    });
+            url: 'http://staging.tangent.tngnt.co/api-token-auth/',
+            type: 'POST',
+            data: {"username":"pravin.gordhan","password":"pravin.gordhan",}, 
+            success: function(data) {
+                remote_link(data.token)
+                },
+            error : function(){$(".alert p").html("Error importing data");}
+        })
+
+
 };
-// Basic importing reviews
-function get_review(token){
-    $.ajax({
-        url: 'http://staging.tangent.tngnt.co/api/review/',
-        type: 'GET',
-        dataType: 'json',
-        contentType: 'application/json',
-        headers: {'Authorization': "Token " + token,},
-        success: function(data) {import_review(data);},
-        error : function(){$("#login_error").html("Please Try me again...");}
-    });
-};
-// Request to Django to import the employees
-function import_employees(data,token){
-    $.ajax({
-        url: '/import_employees/',
-        type: 'POST',
-        dataType: 'json',
-        contentType: 'application/json',
-        data:JSON.stringify(data),
-        success: function(return_data) {
-                    get_review(token);
-                    $("#login_error").html("Waiting for imports...");},
-        error : function(){ $("#login_error").html("Please Try me again...");}
-    });
-};
-// Request to web API to get the employees data
-function get_employees(token){
-    $.ajax({
-        url: 'http://staging.tangent.tngnt.co/api/employee/',
-        type: 'GET',
-        dataType: 'json',
-        contentType: 'application/json',
-        headers: {'Authorization': "Token " + token,},
-        success: function(data) {import_employees(data,token);},
-        error : function(){$("#login_error").html("Please Try me again...");}
-    });
-};
-//
-function remote_link(){
-    $.ajax({
-        url: 'http://staging.tangent.tngnt.co/api-token-auth/',
-        type: 'POST',
-        data: {"username":"pravin.gordhan","password":"pravin.gordhan",}, 
-        success: function(data) {get_employees(data.token);},
-        error : function(){alert('frrrt');$("#login_error").html("Invalid username or password");}
-    });
+
+
+function remote_link(token){
+
+
+    data = '';
+    api_calls = [
+        'http://staging.tangent.tngnt.co/api/employee/','http://staging.tangent.tngnt.co/api/group/',
+        'http://staging.tangent.tngnt.co/api/review/','http://staging.tangent.tngnt.co/api/leave/',
+        "http://staging.tangent.tngnt.co/api/public-holidays/","http://staging.tangent.tngnt.co/api/customer/"];
+
+    for (i = 0; i < api_calls.length; i++) {    
+
+        $.ajax({
+            url: api_calls[i],
+            type: 'GET',
+            dataType: 'json',
+            contentType: 'application/json',
+            headers: {'Authorization': "Token " + token,},
+            success: function(data) {
+
+                    $.ajax({
+                        url: '/import_employees/',
+                        type: 'POST',
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        data:JSON.stringify(data),
+                        success: function(return_data) 
+                                    {
+                                        $(".alert p").html("Waiting for next import...");
+
+                                    },
+                        error : function(){$(".alert p").html("Please Try me again...");}
+                    });
+
+            },
+            error : function(){$("#login_error").html("Please Try me again...");}
+        });
+    } 
+
 }
+
 //
 $(".profile").click(function() {
     $.ajax({

@@ -34,10 +34,50 @@ class UserProfile(models.Model):
 
 
 # Working on review import need some help...
+class Group(models.Model):
+    name        = models.CharField(max_length=50)
+    def __unicode__(self):
+        return self.name
+
+# Working on review import need some help...
 class Review(models.Model):
     old_id          = models.CharField(max_length=50)
     date            = models.CharField(max_length=50)
     salary          = models.CharField(max_length=50)
     type            = models.CharField(max_length=50)
-    employee        = models.ForeignKey(UserProfile, blank=True, null=True)
+    employee        = models.CharField(max_length=50)
     position        = models.CharField(max_length=50)
+    def __unicode__(self):
+        return self.user.position
+
+class Leave(models.Model):
+    old_id          = models.CharField(max_length=50)
+    employee        = models.CharField(max_length=50)
+    start_date      = models.CharField(max_length=50)
+    end_date        = models.CharField(max_length=50)
+    status          = models.CharField(max_length=50)
+    half_day        = models.CharField(max_length=50)
+    type            = models.CharField(max_length=50)
+    upload          = models.CharField(max_length=50)
+    leave_days      = models.CharField(max_length=50)
+    def __unicode__(self):
+        return self.status
+
+# Working on review import need some help...
+class PublicHoliday(models.Model):
+    old_id          = models.CharField(max_length=50)
+    name            = models.CharField(max_length=50)
+    date            = models.CharField(max_length=50)
+    unique          = models.CharField(max_length=50)
+    def __unicode__(self):
+        return self.name + " : " + self.date
+
+
+class Customer(models.Model):
+    old_id              = models.CharField(max_length=50)
+    name                = models.CharField(max_length=50)
+    code                = models.CharField(max_length=50)
+    description         = models.CharField(max_length=50)
+    physical_address    = models.CharField(max_length=50)
+    def __unicode__(self):
+        return self.name
